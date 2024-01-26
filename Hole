@@ -1,0 +1,48 @@
+
+/**
+ * Write a description of class Skeleton here.
+ *
+ *Create class which will set all of the infromation for the hole
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Hole extends Items
+{
+    public Hole()
+    {
+        //set the index by calling it from the super class
+        setIndex((byte)(5));
+        
+        //set the amount by calling it from the super class
+        setAmount((byte)(6));
+        
+        //set the damage by calling it from the super class
+        setDamage((byte)(2));
+        
+        //set the low by calling it from the super class
+        setLow((byte)(30));
+        
+        //set the high by calling it from the super class
+        setHigh((byte)(40));
+        
+        //set the point by calling it from the super class
+        setPoint((byte)(rand.nextInt((getHigh()-getLow())) + getLow()));
+                
+        //add the image name to the array list in the super
+        itemImages.add("Hole.png");
+        
+        //set the event by calling it from the super class
+        setEvent("hole");
+
+    }
+    
+    /*
+     * Make a method hwich will call the scene and create a scene for the hole trap
+     */
+    public void holeTrap(byte gridSize)
+    {
+        Scene(gridSize,getEvent(),getDamage(),getPoint(),getIndex());
+    }
+    
+}
