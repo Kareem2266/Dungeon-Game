@@ -1,0 +1,1006 @@
+//import required dependencies
+
+import javax.swing.*;
+import java.awt.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.awt.event.ActionListener;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionEvent;
+import javax.swing.JButton;
+import javax.swing.JPanel;
+import javax.swing.JLabel;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.io.*;
+import java.util.ArrayList;
+import java.util.Scanner;
+import java.util.*;
+
+//import javax.swing.border.Border;
+/**
+ * Write a description of class Grid here.
+ *
+ *This class is used in order to get all of the information in realtion to the grid
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Grid 
+{ 
+
+    //create a variable in order to hold the size of the grid
+    private byte bytGridSize = 11;
+
+    //create a provate variabke for the x position of the teleporter
+    private byte bytTeleporterX;
+    
+    //create a provate variabke for the y position of the teleporter
+    private byte bytTeleporterY;
+
+    //create a jframe
+    private static JFrame myFrame;
+
+    //create a 2d array of buttons and setting the size to the 11x11 domain which is wanted
+    private JButton [][] grid = new JButton[bytGridSize][bytGridSize];
+
+    //create a 2d array of bytes in order to hold the positions of the board
+    private byte [][] boardPosition = new byte [bytGridSize][bytGridSize]; 
+
+    //hold the total amount of points of a short
+    private short shrTotalPoints;
+
+    //create a private cariable to hold the character health
+    private byte bytCharacterHealth;
+
+    //create a private variable in order to hold the character health
+    private byte bytCharacterMaxHealth;
+
+    //create the gridpanel jpanel and initialize it
+    private JPanel gridPanel = new JPanel();
+
+    //create a constructor which will be bringing in all of the 
+    Grid(String strFileName, byte bytCharacterSpeed, byte CharacterHealth)
+    {
+        //creating an instance of JFrame called myFrame
+        myFrame = new JFrame("Summative Assignment");
+
+        //setting the default close operation which will be clicking the X button
+        myFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        //setting the location of the JFrame relative to the screen, null is used un order to center the JFrame
+        myFrame.setLocationRelativeTo(null);
+
+        //initialize the 2D array of grid buttons
+        grid = new JButton [bytGridSize][bytGridSize];
+
+        // Create a JPanel with GridLayout to hold the buttons
+        gridPanel = new JPanel(new GridLayout(bytGridSize, bytGridSize)); 
+
+        //allow the frame to be resizable/maximized
+        myFrame.setResizable(true);
+
+        //initialize and add the buttons
+        GridButtons(gridPanel);
+
+        //create a boolean to chekc for the teleporter
+        boolean bolIsTeleporter;
+
+        //create a varible which will hold the amont of space needed at the top
+        int intSpace = 100;
+
+        //set the character health to the user character health
+        bytCharacterHealth = CharacterHealth;
+
+        //set the max health to the current health
+        bytCharacterMaxHealth = CharacterHealth;
+
+        //create a new JLabel
+        JLabel displayInformation = displayInfo(gridPanel);
+
+        //create a 2d array to hold the item grip
+        byte [][] itemGrid;
+
+        //create the object of the action class
+        Actions actions = new Actions();
+
+        //set the preferred size to 1 by the top height which we desired
+        displayInformation.setPreferredSize(new Dimension(1,intSpace));
+
+        //add the top space and put it to the top of the layout by setting the direction to NORTH
+        myFrame.getContentPane().add(displayInformation, BorderLayout.NORTH);
+
+        //set the itemm grid to the ations class method, constrcutor
+        itemGrid = actions.Actions((byte)11); //HERE
+
+        //call the populate board positoin
+        populateBoardPosition(boardPosition, strFileName, bytCharacterSpeed, actions, itemGrid, displayInformation);
+        
+        //load the character at the bototm left corner
+        loadCharacter(strFileName,10,0);
+        
+        //call the stop button click method
+        stopButtonClick(grid, boardPosition,10,0, bytCharacterSpeed);
+
+        //set the frame size
+        myFrame.setSize(1000,800);
+        
+        //set the content pane by using the grid panel
+        myFrame.getContentPane().add(gridPanel);
+        
+        //use the .pack method
+        myFrame.pack();
+
+        //set the frame to full screen
+        myFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        //set the frame to visible
+        myFrame.setVisible(true);
+
+    }
+
+    /*
+     * Create a chech colliosn method which will check whether or not there is any item at the current location
+     */
+    private void checkCollisions(Actions event, byte [][] items, int x,  int y,byte bytGridSize,JButton [][] buttons, byte [][] board, String strFileName, byte bytCharacterSpeed, JLabel info)
+    {
+
+        //make an if statment which whichs whther the user has clocked anything
+        //check is the user has won
+        if (board [x][y] == 121)
+        {
+            //create a try and catch block
+            try
+            {
+                //call the check win method
+                checkWin((byte)x,(byte)y);
+            }
+            catch (IOException ioe)
+            {
+                ioe.printStackTrace();
+            }
+        }
+
+        //create an if statement checking if the index at that item is 1
+        if (items[x][y] == 1)
+        {
+            //create a potion object
+            Potion potion = new Potion();
+            
+            //set the current value at the index to 0 to not repeat
+            items[x][y] = 0;
+            
+            //call the health potion method
+            potion.healthPotion(bytGridSize);
+
+            //add the poonts to the randmize number of poiunts
+            shrTotalPoints += potion.getPoint();
+            
+            //add the poonts to the number of health gained
+            bytCharacterHealth += potion.getHealth();
+
+            //create an if statement cheaking whether or not the health is aboev the max health
+            if (bytCharacterHealth > bytCharacterMaxHealth)
+            {
+                //create a for loop which will make the health = the max health
+                for (byte i = (byte)(bytCharacterHealth - bytCharacterMaxHealth); i > 0; i--)
+                {
+                    //subtract the hgalth from the character health variabble
+                    bytCharacterHealth--;
+                }
+            }
+
+            //cadd a action listener to this button
+            Items.button1.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        //dispose of the action frame
+                        Items.actionFrame.dispose();
+                        
+                        ///use the .set text in order to updat ethe text, and update get info
+                        info.setText(getInfo());
+                    }
+                });
+        }
+        //check whether or not the value is 2
+        else if (items[x][y] == 2)
+        {   
+            //set the counter to 1
+            byte bytCounter = 1;
+
+            //make a for loop which will checke whether or not you are at the first teleporter and not the seoncd
+            for (int i = 0; i < bytGridSize; i++) {
+                for (int j = 0; j < bytGridSize; j++) {
+
+                    //make an if statment which will only pick up the second telep[rter
+                    if (bytCounter == 0)
+                    {
+
+                    }
+                    //finding the second teleporter
+                    else if (items[i][j] == 2)
+                    {
+                        //set the x value to the index
+                        bytTeleporterX = (byte)(i);
+                        
+                        //set the y value to the index
+                        bytTeleporterY = (byte)(j);
+                        
+                        //subtract the counter
+                        bytCounter--;
+                        
+                        //set that index to 2
+                        items[i][j] = 0;
+                    }
+                }
+            }
+
+            //make it so that if there is actaully a teleporter call telported functions
+            if (bytTeleporterX != 0)
+            {
+                //make a new object of teleporter
+                Teleporter teleporter = new Teleporter();
+                
+                //set the value at that index to 0
+                items[x][y] = 0;
+
+                //call the .scene class and send in the values
+                teleporter.Scene(bytGridSize, "teleporter", (byte)0, (byte) 0, teleporter.getIndex());
+
+                //add the points
+                shrTotalPoints += teleporter.getPoint();
+
+                //create an action listener on the button
+                Items.button1.addActionListener(new ActionListener() 
+                    {
+                        public void actionPerformed(ActionEvent e) {
+                            
+                            //call the move character method and send in the new position
+                            moveCharacter(buttons,board, bytTeleporterX, bytTeleporterY, strFileName,bytCharacterSpeed,event,items,true, info);
+
+                            //set the ocation of the teleporter to 0
+                            items[bytTeleporterX][bytTeleporterY] = 0;
+                            
+                            //set the teleport X and Y vairable to 0
+                            bytTeleporterX = 0;
+                            bytTeleporterY = 0;
+                            
+                            //dispose of the frame
+                            Items.actionFrame.dispose();
+                            
+                            //update the text
+                            info.setText(getInfo());
+                        }
+                    });
+            }
+
+        }
+        //check ifthe value is 3
+        else if (items[x][y] == 3)
+        {
+            //make a new chest object
+            Chest chest = new Chest();
+            
+            //set the current postiton vliuae to 0
+            items[x][y] = 0;
+
+            //call the chest item method
+            chest.chestItem(bytGridSize);
+
+            //add the points
+            shrTotalPoints += chest.getPoint();
+
+            //create a action istener
+            Items.button1.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        //close the frame
+                        Items.actionFrame.dispose();
+                        
+                        //update the text
+                        info.setText(getInfo());
+                    }
+                });
+        }
+        //create another else if for the fire trap
+        else if (items[x][y] == 4)
+        {
+            //create a new object for the fire class
+            Fire fire = new Fire();
+            
+            //set the value of the current index to 0
+            items[x][y] = 0;
+
+            //call the fire trap method
+            fire.fireTrap(bytGridSize);
+            
+            //lower the health from the damage variable
+            bytCharacterHealth -= fire.getDamage();
+            
+            //add the poiints
+            shrTotalPoints += fire.getPoint();
+
+            //create a action ilstener on the button
+            Items.button1.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        //dispose of the frame
+                        Items.actionFrame.dispose();
+                        try
+                        {
+                            //check if the user has dies by calling the check win, which also checks if you have loss
+                            checkWin((byte)x,(byte)y);
+                        }
+                        catch (IOException ioe)
+                        {
+                            ioe.printStackTrace();
+                        }
+                        //edit the text
+                        info.setText(getInfo());
+                    }
+                });
+        }
+        //check if the index is 5 for hole
+        else if (items[x][y] == 5)
+        {
+            //cretea e new objecct fo the hole class
+            Hole hole = new Hole();
+            
+            //set the value at the ondex to 0
+            items[x][y] = 0;
+
+            //call the hole trap method
+            hole.holeTrap(bytGridSize);
+
+            //lower the character health
+            bytCharacterHealth -= hole.getDamage();
+            
+            //add the poinrts
+            shrTotalPoints += hole.getPoint();
+
+            //add an action listener
+            Items.button1.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        //dispose of the frame
+                        Items.actionFrame.dispose();
+                        try
+                        {
+                            //call the check win if you die
+                            checkWin((byte)x,(byte)y);
+                        }
+                        catch (IOException ioe)
+                        {
+                            ioe.printStackTrace();
+                        }
+                        //upate the text
+                        info.setText(getInfo());
+                    }
+                });
+        }
+        //make another else if for the spike for 6
+        else if (items[x][y] == 6)
+        {
+            //create a new ibject of the spke
+            Spike spike = new Spike();
+            
+            //set the value of the index to 0
+            items[x][y] = 0;
+
+            //call the spike trap
+            spike.spikeTrap(bytGridSize);
+
+            //lower the health
+            bytCharacterHealth -= spike.getDamage();
+            
+            //add the points
+            shrTotalPoints += spike.getPoint();
+            
+            //create a action listener
+            Items.button1.addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) {
+                        //dispose of the frame
+                        Items.actionFrame.dispose();
+                        try
+                        {
+                            //check if the user has dies
+                            checkWin((byte)x,(byte)y);
+                        }
+                        catch (IOException ioe)
+                        {
+                            ioe.printStackTrace();
+                        }
+                        //update the text
+                        info.setText(getInfo());
+                    }
+                });
+        }
+
+    }
+
+    /*
+     * Create a load character method which will load the character on the new location
+     */
+    private void loadCharacter(String strCharacterImg, int x, int y)
+    {
+        //create try catch bloack
+        try
+        {
+            //create a buffered image and send in the image file
+            BufferedImage bufferedImage = ImageIO.read(new File(strCharacterImg));
+            
+            //create ab image in order to scale an image
+            Image image = bufferedImage.getScaledInstance(50, 25, Image.SCALE_DEFAULT);
+            
+            //create an image icon
+            ImageIcon icon = new ImageIcon(image);
+            
+            //set the index to that specific icon, image
+            grid[x][y].setIcon(icon);
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+    }
+
+    /*
+     * create a method in order to create thebuttons
+     */
+    private void GridButtons(JPanel gridPanel) {
+
+        //create a nested for loop in order to create buttons
+        for (int i = 0; i < bytGridSize; i++) {
+            for (int j = 0; j < bytGridSize; j++) {
+                //create the button at the next
+                grid [i][j] = new JButton();
+                
+                //display the board using the grispanel and the indexes
+                displayBoard(gridPanel, i, j);
+            }
+        }
+    }
+
+    /*
+     * Create a method in order to display the board of buttons
+     */
+    private void displayBoard(JPanel gridPanel, int x, int y) //change the name later, x is act y, y is act x, its weird 
+    {
+        //create a try catch block
+        try {
+            //create if statmente in order to set the specific images to the different positions
+            if (x == 0 && y == 0)
+            {
+                loadImage(gridPanel,"TopLeftWall.png", x, y);
+            }
+            else if (y >= 1 && x == 0 && y<= 10)
+            {
+                loadImage(gridPanel,"TopExitWall.png", x, y);
+            }
+            else if (x== 10 && y == 0)
+            {
+                loadImage(gridPanel,"RegularWall.png", x, y);
+            }
+            else if (x == 0 && y == 10)
+            {
+                loadImage(gridPanel,"RegularWall.png", x, y);
+            }
+            else if (x == 10 && y == 10)
+            {
+                loadImage(gridPanel,"RightCornerWall.png", x, y);   
+            }
+            else if (y == 10) 
+            {
+                if (x % 2 == 0)
+                {
+                    loadImage(gridPanel,"RightCornerWall.png", x, y);
+                }
+                else
+                {
+                    loadImage(gridPanel,"RightWall.png", x, y);
+                }
+            }
+            else if (y == 0) 
+            {
+                if (x % 2 == 0)
+                {
+                    loadImage(gridPanel,"LeftWall.png", x, y);
+                }
+                else
+                {
+                    loadImage(gridPanel,"BottomLeftCornerWall.png", x, y);
+                }
+            }
+            else
+            {
+                loadImage(gridPanel,"RegularWall.png", x, y);
+            }
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+        }
+
+    }
+
+    /*
+     * Create a method in order to load the image
+     */
+    private void loadImage(JPanel gridPanel,String filename, int x, int y) throws IOException 
+    {
+        //create a buffered reader image from the file name
+        BufferedImage bufferedImage = ImageIO.read(new File(filename));
+        
+        //create an image and scale the buffereed image
+        Image image = bufferedImage.getScaledInstance(200, 100, Image.SCALE_DEFAULT);
+        
+        //create an image icon to use
+        ImageIcon icon = new ImageIcon(image);
+        
+        //set that position to the icon image
+        grid[x][y].setIcon(icon);
+        
+        //add the image to the gridPanel
+        gridPanel.add(grid[x][y]);
+    }
+
+    /*
+     * Create a method which will pospulate the board positions
+     */
+    private void populateBoardPosition(byte [][] board, String strFileName, byte bytCharacterSpeed, Actions event, byte [][] items, JLabel info)
+    {
+
+        //creare a byte number which be used to popoulate the positions
+        byte bytNumber = 1;
+
+        //create a for loop which will go though  all of the indexed
+        for (int i = board.length - 1; i >= 0; i--) {
+            
+            //go from one direct to the other
+            if (i % 2 == 0) 
+            {
+                //create a for loop to go through that row
+                for (int j = 0; j < board[i].length; j++) {
+                    //populate the board
+                    board[i][j] = bytNumber;
+                    
+                    //increment the number
+                    bytNumber++;
+                    
+                    //call the move character
+                    moveCharacter(grid, boardPosition, (byte)(i), (byte)(j), strFileName, bytCharacterSpeed,event, items, false, info);
+                }
+            }
+            //go from the oppoosite direction of the above to the other side
+            else 
+            {
+                for (int j = board[i].length - 1; j >= 0; j--) {
+                    //populate the board
+                    board[i][j] = bytNumber;
+                    
+                    //increment the number
+                    bytNumber++;
+                    
+                    //call the move character
+                    moveCharacter(grid, boardPosition, (byte)(i), (byte)(j), strFileName, bytCharacterSpeed, event, items, false, info);
+                }
+            } 
+        }
+
+    }
+
+    /*
+     * Create a method which will stop the buttons clicks for all the buttons behind the user
+     */
+    private void stopButtonClick(JButton [][] buttons,byte [][] board, int x, int y, byte bytCharacterSpeed)
+    {
+        //sent the value variable to the beaord index value
+        byte bytValue = board [x][y];
+
+        //create a nester for loop
+        for (int i = 0; i < bytGridSize; i++) {
+            for (int j = 0; j < bytGridSize; j++) {
+                //create a for loop checking for all of the indexes less than the bytValue
+                if (board [i][j] < bytValue || board [i][j]  > (bytValue + bytCharacterSpeed))
+                {
+                    //set the buttons to inactive
+                    buttons[i][j].setEnabled(false);
+                }
+            }
+        }
+
+    }
+
+    /*
+     * Create a variable which will enable click
+     */
+    private void enableClick(JButton [][] buttons,byte [][] board, int x, int y, byte bytCharacterSpeed)
+    {
+        //set the byte variable t o the value on that index
+        byte byteValue = board [x][y];
+
+        /*
+         * create a nested for loop which will allow the user to click on the buttons ahead of them sepening on their speed
+         */
+        for (byte i = 0; i < bytGridSize; i++) {
+            for (byte j = 0; j < bytGridSize; j++) {
+                if (board [i][j] >= byteValue && board [i][j]  <= (byteValue + bytCharacterSpeed))
+                {
+                    //set the buttons enables to true
+                    buttons[i][j].setEnabled(true);
+                }
+            }
+        }
+
+    }
+
+    /*
+     * Create a method which will move the character
+     */
+    private void moveCharacter(JButton [][] buttons,byte [][] board, byte x,  byte y, String strFileName, byte bytCharacterSpeed, Actions event, byte [][] items, boolean bolTeleport, JLabel info)
+    {
+        //make an if ststament which will differentiate between movement and teleportation
+        if (bolTeleport == false)
+        {
+            //add a action listsner to the button
+            buttons[x][y].addActionListener(new ActionListener() 
+                {
+                    public void actionPerformed(ActionEvent e) {
+
+                        //call the stop button click
+                        stopButtonClick(grid, board,x,y, bytCharacterSpeed);
+                        
+                        //call the load character
+                        loadCharacter(strFileName,x,y);
+                        
+                        //call the enable click
+                        enableClick(grid, board,x,y, bytCharacterSpeed);
+
+                        //call the check collisions
+                        checkCollisions(event, items, x,y,bytGridSize,buttons, board, strFileName, bytCharacterSpeed, info);
+                    }
+                });
+        }
+        //if it is an teleporter
+        else if (bolTeleport == true)
+        {
+            //call the stop button click
+            stopButtonClick(grid, board,x,y, bytCharacterSpeed);
+            
+            //call the load character
+            loadCharacter(strFileName,x,y);
+            
+            //call the enable lock
+            enableClick(grid, board,x,y, bytCharacterSpeed);
+
+            //call the call collision
+            checkCollisions(event, items, x,y,bytGridSize,buttons, board, strFileName, bytCharacterSpeed, info);
+        }
+
+    }
+
+    /*
+     * Create a method which will check if the user has won
+     */
+    private void checkWin(byte x, byte y) throws IOException
+    {
+
+        //create a jframe for the end
+        JFrame endFrame;
+        
+        //create a jpanel for the ening
+        JPanel endPanel;
+        
+        //create a label for the message
+        JLabel label = new JLabel(); 
+        
+        //create another label for te message
+        JLabel label2 = new JLabel(); 
+        
+        //create a button for the contniue
+        JButton button = new JButton();
+
+        //create a if statment that will check if the user has reached the end
+        if ( x == 0 && y == 10)
+        {
+            //set the frame to false
+            myFrame.setVisible(false);
+            
+            //dispose the myFrame frame
+            myFrame.dispose();
+
+            //set the name of the endFrame
+            endFrame = new JFrame("Victory Menu");
+
+            //setting the default close operation which will be clicking the X button
+            endFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            //setting the location of the JFrame relative to the screen, null is used un order to center the JFrame
+            endFrame.setLocationRelativeTo(null);
+
+            //allow the frame to be resizable/maximized
+            endFrame.setResizable(true);
+
+            // Create a JPanel with GridLayout to hold the buttons
+            endPanel = new JPanel(new GridLayout(bytGridSize, bytGridSize));
+
+            //use the .pack method in order to move and positoin
+            endFrame.pack();
+            
+            //set the size of the frame
+            endFrame.setSize(1000,800);
+            
+            //set the frame to be maximized
+            endFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            
+            //set the frame to visible
+            endFrame.setVisible(true);
+
+            //set the label to the win text
+            label = new JLabel("You have won the game with " + shrTotalPoints + " points!");
+            
+            //use dimension ato get the predereed size ofthe lable
+            Dimension size = label.getPreferredSize();
+            
+            //set the label position with setBounds
+            label.setBounds(700, 200, size.width+200, size.height+25);
+
+            //set the label to the leaderboard text
+            label2 = new JLabel("Leaderboard       " + (leaderboard(shrTotalPoints)));
+            
+            //use dimension ato get the predereed size ofthe lable
+            Dimension size2 = label.getPreferredSize();
+            
+            //set the label position with setBounds
+            label2.setBounds(700, 200, size2.width+200, size2.height+200);
+
+            //initialize the JButton and set it to restart
+            button = new JButton("Restart");
+            
+            //use dimension ato get the predereed size ofthe button
+            Dimension size3 = button.getPreferredSize();
+            
+            //set the label position with setBounds
+            button.setBounds(750, 600, size3.width+25, size3.height+25);
+
+            //add the label to panel
+            endPanel.add(label);
+            
+            //add the label to panel
+            endPanel.add(label2);
+            
+            //add the button to panel
+            endPanel.add(button);
+
+            //set the layout to the middle of the screen
+            endPanel.setLayout(null);            
+
+            //add the end Panel to the frame
+            endFrame.getContentPane().add(endPanel);
+
+            //add a button listener
+            button.addActionListener(new ActionListener() 
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        //dispose the end frame
+                        endFrame.dispose();
+                        
+                        //set the end frame visiblility to false
+                        endFrame.setVisible(false);
+                        
+                        //restart the game using startMenu 
+                        StartMenu restart = new StartMenu();
+
+                    }
+                }
+            );
+
+        }
+        //check if the user health is less than equal to 0
+        else if (bytCharacterHealth <= 0)
+        {
+            //set the my frame to false
+            myFrame.setVisible(false);
+            
+            //dispose of the myFrame
+            myFrame.dispose();
+
+            //initialize a new frame and call it end menu
+            endFrame = new JFrame("End Menu");
+
+            //setting the default close operation which will be clicking the X button
+            endFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+            //setting the location of the JFrame relative to the screen, null is used un order to center the JFrame
+            endFrame.setLocationRelativeTo(null);
+
+            //allow the frame to be resizable/maximized
+            endFrame.setResizable(true);
+
+            // Create a JPanel with GridLayout to hold the buttons
+            endPanel = new JPanel(new GridLayout(bytGridSize, bytGridSize));
+
+            //call the .pack method
+            endFrame.pack();
+            
+            //set the size
+            endFrame.setSize(1000,800);
+            
+            //set the frame to be full screen
+            endFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+            
+            //set visibility to true
+            endFrame.setVisible(true);
+
+            //add the test to the user that they lost
+            label = new JLabel("You have no more health, you lost!");
+            
+            //use dimension to get the predereed size ofthe button
+            Dimension size2 = label.getPreferredSize();
+            
+            //set the position of the label
+            label.setBounds(700, 200, size2.width+200, size2.height+25);
+
+            //intitialize the button and name it restart
+            button = new JButton("Restart");
+            
+            //use dimension to get the predereed size ofthe button
+            Dimension size = button.getPreferredSize();
+            
+            //set the position
+            button.setBounds(750, 500, size.width+25, size.height+25);
+
+            //add the label to the panel
+            endPanel.add(label);
+            
+            //add the button to the panel
+            endPanel.add(button);
+
+            //set the layout
+            endPanel.setLayout(null);            
+
+            //add the end panel to the end frame
+            endFrame.getContentPane().add(endPanel);
+
+            //add an action listener to see if the user wants to restart
+            button.addActionListener(new ActionListener() 
+                {
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+
+                        //use dispose the end fra,e
+                        endFrame.dispose();
+                        
+                        //set the endframe visibility to false
+                        endFrame.setVisible(false);
+                        
+                        //create a new start menu
+                        StartMenu restart = new StartMenu();
+
+                    }
+                }
+            );
+
+        }
+    }
+
+    //create a method hiwhc will return a label
+    private JLabel displayInfo(JPanel panel)
+    {
+
+        //create a new label
+        JLabel label = new JLabel(); 
+
+        //initialize tha label to the get info method
+        label = new JLabel(getInfo());
+        
+        //use dimension to get the predereed size of the label
+        Dimension size = label.getPreferredSize();
+        
+        //set the position of the label using .setBounds
+        label.setBounds(600, 600, size.width+100, size.height+25);
+
+        //return the label
+        return label;
+
+    }
+
+    //create a getainfor mehod hwich will return the infrmation of the charactwe once called, will be used when they lose
+    private String getInfo()
+    {
+        //return the infroamtion
+        return "     Health: " + bytCharacterHealth + "   Points: " + shrTotalPoints;
+    }
+
+    //short for scalability
+    //create a string leaderboard which will use file IO to get the leaderboard from a text file
+    private String leaderboard (short shrPoints) throws IOException
+    {
+
+        //create and initialize a string variable to hold the leaderboard
+        String strLeaderboard = "";
+
+        //create a array list in order to hold the shorts
+        ArrayList<Short> scores = new ArrayList<Short>();
+
+        //create PrintWriter
+        PrintWriter out = new PrintWriter(new FileWriter("Leaderboard.txt",true));
+
+        //output to the file the points
+        out.println(shrPoints);
+
+        //close the printWriter
+        out.close();
+
+        //create a buffered reader and call it in
+        BufferedReader in;
+
+        //create a scnaner and read the file LeaderBoard.text
+        Scanner scanner = new Scanner(new FileReader("Leaderboard.txt"));
+        
+        //check whether or not the scanner has a next line
+        while (scanner.hasNextLine()) 
+        {
+            //add the socre to the scores array list
+            scores.add(Short.parseShort(scanner.nextLine()));
+        }
+
+
+        //declare variables to store the index of the current number, and the value of the current num
+        short shrCurNumber, shrCurIndex;
+
+        //use a instertion sort
+        for(int i = 1; i<scores.size(); i++)
+        {
+            //set the current number to to value of the array list
+            shrCurNumber = scores.get(i);
+
+            //set index to be one place to the left
+            shrCurIndex = (short)(i - 1);
+
+            //loop as long as we are still inbounds and the current number 
+            //is less than the current index
+            while(shrCurIndex >= 0 && scores.get(shrCurIndex) < shrCurNumber)
+            {
+                //shift the value at the curIndex to the right one place
+                //putting them into order
+                scores.set(shrCurIndex + 1, scores.get(shrCurIndex));
+
+                shrCurIndex--;
+
+            }
+            //put the number into the proper location
+            scores.set(shrCurIndex + 1, shrCurNumber);
+
+        }
+
+        //check whether or not the size is greater than 5
+        if (scores.size() > 5)
+        {
+
+            //if it is, take the first five index from the array list
+            for (byte i = 0; i < 5; i++)
+            {
+                //add to the strLeaderBoard Variable
+                strLeaderboard += " " + (i + 1) + ": " + scores.get(i) + " ";
+            }
+        }
+        //make an else to see if we are less than 5
+        else 
+        {
+            //make a for loop which runs for the amount of time
+            for (byte i = 0; i < scores.size(); i++)
+            {
+                //add to the leaderboard variable
+                strLeaderboard += " " + (i + 1) + ": " + scores.get(i) +" ";
+            }
+        }
+
+        //return the strLeaderBoard string variable
+        return strLeaderboard;
+
+    }
+}
