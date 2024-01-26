@@ -1,0 +1,66 @@
+//import dependincies
+
+import javax.swing.*;
+import java.awt.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+/**
+ * Write a description of class Character here.
+ *
+ *This character class will hold the different variables for the character class
+ *Will be used as an inhertiance structire, as well as using getter and setter to private variables
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Character
+{
+    //create variable for health and ste it to private
+    private byte bytCharacterHealth;
+    
+    //creates apriavte byte character speed
+    private byte bytCharacterSpeed;
+    
+    //create a private string in order to hold the file name
+    private String strFileName;
+    
+    /*
+     * create getters and setter for the above variables
+     */
+    
+    public byte getCharacterHealth()
+    {
+        return bytCharacterHealth;
+    }
+
+ 
+    public void setCharacterHealth(byte characterHealth)
+    {
+        this.bytCharacterHealth = characterHealth;
+    }
+
+    public byte getCharacterSpeed()
+    {
+        return bytCharacterSpeed;
+    }
+
+    public void setCharacterSpeed(byte characterSpeed)
+    {
+        this.bytCharacterSpeed = characterSpeed;
+    }
+
+    public String getFileName()
+    {
+        return strFileName;
+    }
+
+    public void setFileName(String fileName)
+    {
+        this.strFileName = fileName;
+    }
+}
+    
+
