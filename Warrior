@@ -1,0 +1,47 @@
+/**
+ * Write a description of class Warrior here.
+ *
+ *Make a class which will hold the information about the warrior, and start the game with the inforamtion of the warrior class
+ *
+ * @author (Kareem)
+ * @version (2024-01-18)
+ */
+public class Warrior extends Character 
+{   
+    
+    //create a constructor which will populate the different variables which the warrior class will have, will be called if string 
+    public Warrior ()
+    {
+        //call a setter for the character health
+        setCharacterHealth((byte)(10));
+        
+        //call a setter for the character speed
+        setCharacterSpeed((byte)(2));
+        
+        //call a setter for the character image file
+        setFileName("Warrior.png");     
+        
+        //create a new grid object will the following information
+    }
+    
+    //called when a string is entered for an updated character, scalability
+    public Warrior (String fileName)
+    {  
+        
+        //call a setter for the character health
+        setCharacterHealth((byte)(10));
+        
+        //call a setter for the character speed
+        setCharacterSpeed((byte)(2));
+        
+        //create a new grid object will the following information
+        Grid grid = new Grid(getFileName(),getCharacterSpeed(),getCharacterHealth());        
+    }
+    
+    //begin the game with the user file, just incase their hardcode anything we will take
+    public void beginGame(String strFile)
+    {
+        //create a new grid object will the following information
+        Grid grid = new Grid(strFile,getCharacterSpeed(),getCharacterHealth());
+    }
+}
