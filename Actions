@@ -1,0 +1,148 @@
+
+import java.util.Random;
+/**
+ * Write a description of class Actions here.
+ *
+ *Create a class which will initialize all of the objects and will assign the values to the  differnet items
+ *Used for items and their positions
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Actions
+{
+    //randomize positions rahhhhh
+    //make random ah method here (add dodgeRate)
+    private byte [][] itemPositions;
+
+    private Random rand = new Random();
+    //byte bytLow,bytHigh;
+
+    //create a byts for the x and y coordinates
+    private byte bytX, bytY;
+    
+    //create a method which will return a 2d array list with the items positions
+    byte [][] Actions (byte gridSize)
+    {
+
+        //create an object for the potion
+        Potion potion = new Potion();
+        
+        //create an object for the teleporter
+        Teleporter teleporter = new Teleporter();
+        
+        //create an object for the chest
+        Chest chest = new Chest();
+        
+        //create an object for the spike
+        Spike spike = new Spike();
+        
+        //create an object for the hole
+        Hole hole = new Hole();
+        
+        //create an object for the fire
+        Fire fire = new Fire();
+
+        //set the size of the item postisoins 2d array
+        itemPositions = new byte [gridSize][gridSize];
+
+        //create a 2d array which initializes all of the item values to 0 initially
+        for (int i = 0; i < gridSize; i++) {
+            for (int j = 0; j < gridSize; j++) {
+                //set the position to 0
+                itemPositions[i][j] = 0;
+            }
+        }
+
+        //set the first and last value indexes to 10
+        itemPositions[10][0] = 10;
+        itemPositions[0][10] = 10;
+
+        //call the randomize teleporter method
+        randomizeTeleporter(itemPositions,teleporter.getIndex(),gridSize);
+        
+        //call the randomize item for the different items
+        randomizeItem(itemPositions, potion.getIndex(), gridSize, potion.getAmount());
+        randomizeItem(itemPositions, chest.getIndex(), gridSize, chest.getAmount());
+        randomizeItem(itemPositions, spike.getIndex(), gridSize, spike.getAmount());
+        randomizeItem(itemPositions, hole.getIndex(), gridSize, hole.getAmount());
+        randomizeItem(itemPositions, fire.getIndex(), gridSize, fire.getAmount());
+
+        //return the positions for the 2d array
+        return itemPositions;
+
+    }
+
+    /*
+     * Create a method which will randomize a byte
+     */
+    private byte randomize(byte bytLow, byte bytHigh)
+    {
+        //create a byte to hold the value
+        byte bytPosition;
+
+        //use the ran.Next in order to get a positoin with the high and low variable being sent in 
+        bytPosition = (byte)(rand.nextInt((bytHigh-bytLow)) + bytLow);
+
+        //return the positoin
+        return bytPosition;
+    }
+
+    /*
+     * Create a method which will randmize the locations of the teleporter
+     */
+    private void randomizeTeleporter(byte [][] items, byte index, int gridSize)
+    {
+
+        //randomize the x vale
+        bytX = randomize ((byte)1,(byte)(gridSize -1));
+
+        //randomize the y vale
+        bytY = randomize ((byte)(5),(byte)(gridSize - 2));
+
+        //set the items value index to the index
+        items [bytX][bytY] = index;
+
+        //randomize the x and y positoins to get a new poition, and send in differnet hhigh and lows
+        bytX = randomize ((byte)1,(byte)(gridSize - 1));
+
+        bytY = randomize ((byte)1,(byte)((gridSize/2)));
+
+        //set the other teleporter to the index
+        items [bytX][bytY] = index;
+
+    }
+
+    /*
+     * Create a method which will randmoze the item locations, if that location is empty
+     */
+    private void randomizeItem(byte [][] items, byte index,byte gridSize, byte itemsAmount)
+    {
+
+        //randomize the x and y variables
+        bytX = (byte)(randomize((byte)1,(byte)(10)));
+        bytY = (byte)(randomize((byte)1,(byte)(10)));
+        
+        //do nothing if there are 0 items (RECURSION YAY)
+        if(itemsAmount <= 0)
+        {
+            
+        }
+        //if the index of the item is 0, be able to add an item
+        else if(items[bytX][bytY] == 0)
+        {
+            //set the value of the index to the value being sent in 
+            items[bytX][bytY] = index;
+            
+            //randomize the item by sending in one les for the items amount
+            randomizeItem(items,index,gridSize,(byte)(itemsAmount - 1));
+        }
+        //make an else if to see is there is alreadyd an item there
+        else if(items[bytX][bytY] != 0)
+        {
+            //recall the method with the same amount of itmes
+            randomizeItem(items,index,gridSize,itemsAmount);
+        }
+ 
+    }
+}
