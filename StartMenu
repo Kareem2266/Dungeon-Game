@@ -1,0 +1,308 @@
+//impoort required dependencies
+
+import javax.swing.*;
+import java.awt.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+
+/**
+ * Write a description of class Characters here.
+ *
+ *This character startMenu Class will bring up a start menu to the user and allow the user to pick a character
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class StartMenu
+{
+
+    //create a variable in order to hold the size of the grid
+    public byte bytGridSize = 11;
+
+    //creating a JFrame
+    private JFrame startFrame;
+
+    //set a private int in order to hold the character position
+    private int characterPosition = 0;
+
+    //create different objects of the warrior, archer and wizard classs but dont initialize as we will do thta later
+    private Warrior warrior;
+    private Archer archer;
+    private Wizard wizard;
+
+    //create a default constructor which will start the game once it is called
+    public StartMenu ()
+
+    {
+
+        //creating an instance of JFrame called myFrame
+        startFrame = new JFrame("Start Menu");
+
+        //set the relative location of the frame to null in order to center it
+        startFrame.setLocationRelativeTo(null);
+
+        //setting the default close operation which will be clicking the X button
+        startFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
+        // Create a JPanel with GridLayout to hold the buttons
+        JPanel welcomePanel = new JPanel(new GridLayout(bytGridSize, bytGridSize)); 
+
+        //allow the frame to be resizable/maximized
+        startFrame.setResizable(true);
+
+        //initialize the different objects in order to make the information for the characters
+        warrior = new Warrior();
+        archer = new Archer();
+        wizard = new Wizard();
+
+        //create an array list of strings in order to hold thecharacter images
+        ArrayList<String> characterImages = new ArrayList<String>();
+
+        //add different images to the array list by calling the getFile Name
+        characterImages.add(warrior.getFileName());
+        characterImages.add(archer.getFileName());
+        characterImages.add(wizard.getFileName());
+
+        //create a array list of jButtons and initialize them (for scalability)
+        ArrayList<JButton> characterButtons = new ArrayList<JButton>();
+
+        //call the adding character methos and send in the panel, the images array and the buttons arraylist
+        addingCharacters(welcomePanel,characterImages, characterButtons);
+
+        //add the information from the welcome panel to the content pane of the start frame
+        startFrame.getContentPane().add(welcomePanel);
+
+        //use the .pack method in order to size the frame so that all its contents are at or above their preferred sizes
+        startFrame.pack();
+
+        //set the framr size
+        startFrame.setSize(1000,800);
+
+        //set the frame to full screen
+        startFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        //set the start frame to visible
+        startFrame.setVisible(true);
+
+    }
+
+    /*
+     * Create a method which adds the character to the scene and positions them calling them from the constructor in order to 
+     * create the different character images and place them
+     */
+    private void addCharacter(JPanel menuPanel, String strFileName, byte bytIndexNumber, ArrayList<JButton> characterButtons, ArrayList<String> characters)
+    {
+        //create a JLabel and initialize it
+        JLabel label = new JLabel();  
+
+        //create a try catch in order to catch errors
+        try
+        {
+            //create a bufferedImage and use the the file name in order to get the file
+            BufferedImage bufferedImage = ImageIO.read(new File(strFileName));
+
+            //used buffered image in order to scale the image
+            Image image = bufferedImage.getScaledInstance(100, 100, Image.SCALE_DEFAULT);
+
+            //paints icons from images using ImageIcon
+            ImageIcon icon = new ImageIcon(image);
+            label.setIcon(icon);
+            //label.setPosition(100,100);
+
+            //set the character position to 1/3rd of the total frame
+            characterPosition += (1000/3);
+
+            //call the set potioin method
+            setPosition(menuPanel,label,characterPosition,false);
+
+            //call the adding info button
+            addingInfo(menuPanel, bytIndexNumber,characterPosition);
+
+            //calling the add buttons method
+            addButtons(menuPanel,characterPosition,characterButtons,characters);
+
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+    }
+
+    /*
+     * Create a adding character method which will loop though the different characters and do the call the add acharacter will all of the 
+     * images and different playable charactes
+     */
+    private void addingCharacters(JPanel welcomePanel, ArrayList<String> characters, ArrayList<JButton> characterButtons)
+    {
+
+        //make a for loop in order to go though the different character in the game in order to create the image for all of the characters
+        for (int i = 0; i < characters.size(); i++)
+        {
+            //call the add character mthod
+            addCharacter(welcomePanel,characters.get(i),(byte) (i + 1), characterButtons, characters);
+        }
+    }
+
+    /*
+     * create a adding info method in order to display the information about the characters on the label
+     */
+    private void addingInfo(JPanel menuPanel,byte index, int intPosition)
+    {
+
+        //create a label and name it information
+        JLabel label = new JLabel("Information");
+
+        //create a if statement in order to presonalize the information depending on the character index
+        if(index == 1)
+        {
+            //using the tooltip text, i am able to display the information as the user hovers
+            //using <html> in order to edit it. The html tage needs a beggining and a end which is notated by <html> & </html> 
+            //within the html tags, were able to use html code and the <br> is done in order to break line and make the UI cleaner
+            label.setToolTipText("<html><h2>This character is the Warrior!</h2><br>" 
+                + "The Warrior is mostly known for its increase amount of health and good amount of damage. However, the Warrior has low speed<br>"
+                + "Stats: <br>Health: " + warrior.getCharacterHealth() + "<br>Speed: " + warrior.getCharacterSpeed() + "</html>");
+
+            //call the set position method in order to set the position of the label
+            setPosition(menuPanel, label, intPosition,true);
+        }
+        //create a else if statement in order to presonalize the information depending on the character index
+        else if(index == 2)
+        {
+            //using the tooltip text, i am able to display the information as the user hovers
+            //using <html> in order to edit it. The html tage needs a beggining and a end which is notated by <html> & </html> 
+            //within the html tags, were able to use html code and the <br> is done in order to break line and make the UI cleaner
+            label.setToolTipText("<html><h2>This character is the Archer!</h2><br>" 
+                + "The Archer is mostly known for its increase amount of speed and good amount of damage. However, the Archer has low health<br>"
+                + "Stats: <br>Health: " + archer.getCharacterHealth() +  "<br>Speed: " + archer.getCharacterSpeed() + "</html>");
+
+            //call the set position method in order to set the position of the label
+            setPosition(menuPanel, label, intPosition,true);
+        }
+        //create a else if statement in order to presonalize the information depending on the character index
+        else if(index == 3)
+        {
+            //using the tooltip text, i am able to display the information as the user hovers
+            //using <html> in order to edit it. The html tage needs a beggining and a end which is notated by <html> & </html> 
+            //within the html tags, were able to use html code and the <br> is done in order to break line and make the UI cleaner
+            label.setToolTipText("<html><h2>This character is the Wizard!</h2><br>" 
+                + "The Wizard is mostly known for its medium amount of speed and very high amount of damage. However, the Wizard has very low health<br>"
+                + "Stats: <br>Health: "+ wizard.getCharacterHealth() + " <br>Speed: " + wizard.getCharacterSpeed()  +"</html>");
+
+            //call the set position method in order to set the position of the label
+            setPosition(menuPanel, label, intPosition,true);
+        }
+    }
+
+    /*
+     * create a mthod in order to set position of the different items. Used to position them on the panel
+     */
+    private void setPosition(JPanel menuPanel,JLabel label, int intPositionX, boolean isInfo)
+    {
+        //make an if statment which positions the items, an if statement which checks if its info or images
+        if (isInfo == false)
+        {
+            //create a Dimension in order to get the size preference
+            Dimension size = label.getPreferredSize();
+            
+            //set the bounds of the label
+            label.setBounds(characterPosition - 15, 200, size.width, size.height);
+            
+            //set the menu pane layout to center it
+            menuPanel.setLayout(null);
+            
+            //add the label to the menu
+            menuPanel.add(label);
+        }
+        else
+        {
+            //create a Dimension in order to get the size preference
+            Dimension size = label.getPreferredSize();
+            
+            //set the bounds of the label
+            label.setBounds(characterPosition, 400, size.width + 50, size.height);
+            
+            //set the menu pane layout to center it
+            menuPanel.setLayout(null);
+            
+            //add the label to the menu
+            menuPanel.add(label);
+        }
+    }
+
+    /*
+     * Create a methos which will add buttons to the start menu
+     */
+    private void addButtons(JPanel menuPanel, int intPositionX,ArrayList<JButton> buttons, ArrayList<String> characters )
+    {
+        //set the jbutton tect to the different ptions and set the idfferent numbers
+        JButton button = new JButton("Option " + (buttons.size() + 1));
+
+        //create a Dimension in order to get the size preference
+        Dimension size = button.getPreferredSize();
+        
+        //set the bounds of the character
+        button.setBounds(characterPosition-25, 500, size.width + 50, size.height);
+        
+        //set the layout of the layout
+        menuPanel.setLayout(null);
+        
+        //add the button to the array list
+        buttons.add(button);
+
+        //add the button to the panel
+        menuPanel.add(button);
+
+        //create an action listener in order to check when a button has been clicked
+        button.addActionListener(new ActionListener() 
+            {
+                @Override
+                //add the action performed dmethod
+                public void actionPerformed(ActionEvent e) {
+
+                    //create an if statement to see if the index of the button is set to 1
+                    if (buttons.indexOf(button) + 1 == 1)
+                    {
+                        //start the game with the warrior information
+                        warrior.beginGame(warrior.getFileName());
+                        
+                        //set the start frame to false
+                        startFrame.setVisible(false);
+                        
+                        //disapose the frame
+                        startFrame.dispose();
+                    }
+                    //create an else if statement to see if the index of the button is set to 2
+                    else if (buttons.indexOf(button) + 1 == 2)
+                    {
+                        //start the game with the archer information
+                        archer.beginGame(archer.getFileName());
+                        
+                        //set the start frame to false
+                        startFrame.setVisible(false);
+                        
+                        //disapose the frame
+                        startFrame.dispose();
+                    }
+                    //create an else if statement to see if the index of the button is set to 3
+                    else if (buttons.indexOf(button) + 1 == 3)
+                    {
+                        //start the game with the wizard information
+                        wizard.beginGame(wizard.getFileName());
+                        
+                        //set the start frame to false
+                        startFrame.setVisible(false);
+                        
+                        //disapose the frame
+                        startFrame.dispose();
+                    }
+
+                }
+            });
+
+    }
+}
