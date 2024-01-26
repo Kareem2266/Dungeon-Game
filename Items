@@ -1,0 +1,342 @@
+//import the requires dependencies
+
+import javax.swing.*;
+import java.awt.*;
+import javax.imageio.ImageIO;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.util.Random;
+import javax.swing.JLabel;
+
+/**
+ * Write a description of class Items here.
+ *
+ *Create a class hwich will hold all of the functionality for the differnet items within the game, including adding the images,
+ *actions, etc...
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Items
+{
+
+    //create a private variable to hold the grid size
+    private byte bytGridSize = 11;
+
+    //create a private variable to hold the points
+    private byte bytPoints;
+
+    //create a private variable to hold the health
+    private byte bytHealth;
+
+    //create a private variable to hold the distance
+    private byte bytDistance;
+
+    //create a private variable to hold the damage
+    private byte bytDamage;
+
+    //create a private variable to hold the amount of items
+    private byte bytAmount;
+
+    //create a private variable to hold the inedx
+    private byte bytIndex;
+
+    //create a private variable to hold the run amount
+    private byte bytRunAmount = 0;
+
+    //create a private variable to hold the string event
+    private String strEvent;
+
+    //create private byte variables for the high amd low for randomoziayiom
+    private byte bytLow,bytHigh;
+
+    //create a random object
+    Random rand = new Random();
+
+    //creating a JFrame
+    static JFrame actionFrame;
+
+    //create a array list of string called item images holding the item images
+    static ArrayList<String> itemImages = new ArrayList<String>();
+
+    //create a jButton and initilize it
+    static JButton button1 = new JButton();
+
+    /*
+     * Create a scene method hwich will display the different events
+     */
+    void Scene(byte bytGridSize, String strEvent, byte bytImpact, byte bytPoints, byte bytIndexNumber)
+    {
+        //initialize the frame using the event name
+        actionFrame = new JFrame(strEvent + " Event");
+
+        //setting the default close operation which will be clicking the X button
+        actionFrame.setDefaultCloseOperation(0);
+
+        //setting the location of the JFrame relative to the screen, null is used un order to center the JFrame
+        actionFrame.setLocationRelativeTo(null);
+
+        // Create a JPanel with GridLayout to hold the buttons
+        JPanel eventPanel = new JPanel(new GridLayout(bytGridSize, bytGridSize)); 
+
+        //allow the frame to be resizable/maximized
+        actionFrame.setResizable(true);
+
+        //call the add item method
+        addItem(eventPanel,bytImpact,itemImages,strEvent,bytIndexNumber);
+
+        //add the event panel to the action frame
+        actionFrame.getContentPane().add(eventPanel);
+
+        //use the action frame.pack for the frame
+        actionFrame.pack();
+
+        //set the frame size
+        actionFrame.setSize(1000,800);
+
+        //set the frame to full screen
+        actionFrame.setExtendedState(JFrame.MAXIMIZED_BOTH);
+
+        //set the action frame to true
+        actionFrame.setVisible(true);
+
+    }
+
+    /*
+     * Create a method in order to add the items
+     */
+    private void addItem(JPanel eventPanel, byte bytImpact, ArrayList<String> images, String strEvent,  byte bytIndex)
+    {
+        //create a try catch
+        try
+        {
+
+            //create a new label
+            JLabel label = new JLabel();  
+
+            //create a buffered image
+            BufferedImage bufferedImage = ImageIO.read(new File(images.get(bytIndex-1)));
+
+            //create an image image and scale the image
+            Image image = bufferedImage.getScaledInstance(50, 50, Image.SCALE_DEFAULT);
+
+            //set the icon to the image
+            ImageIcon icon = new ImageIcon(image);
+
+            //set the label to the image icon
+            label.setIcon(icon);
+
+            //call the add buttons method to add buttons
+            addButtons(eventPanel,strEvent,bytImpact, label);
+
+        }
+        catch (IOException ioe)
+        {
+            ioe.printStackTrace();
+        }
+    }
+
+    /*
+     * Create a method to add buttons depending on the user infromation
+     */
+    private void addButtons(JPanel eventPanel, String strEvent, byte bytImpact, JLabel image)
+    {
+
+        //create a new label
+        JLabel label = new JLabel(); 
+
+        //make an if statment to make sur ethat the event is potion
+        if (strEvent.equals("potion"))
+        {
+            //initialize the label
+            label = new JLabel("You have gained " + bytImpact + " health though the potion!");
+
+            //use dimension ato get the predereed size ofthe lable
+            Dimension size2 = label.getPreferredSize();
+
+            //set the label position with setBounds
+            label.setBounds(625, 200, size2.width+200, size2.height+25);
+        }
+        //make an if statment to make sur ethat the event is a teleporter
+        else if (strEvent.toLowerCase().equals("teleporter"))
+        {
+            //initialize the label
+            label = new JLabel("Wow you have come into contact with a teleporter, where will you end up!");
+        }
+        //make an if statment to make sur ethat the event is a chest
+        else if (strEvent.toLowerCase().equals("chest"))
+        {
+            //initialize the label
+            label = new JLabel("Wow you have come into contact with a chest, you gained " + bytImpact + " gold!");
+
+            //use dimension ato get the predereed size ofthe lable
+            Dimension size2 = label.getPreferredSize();
+
+            //set the label position with setBounds
+            label.setBounds(575, 200, size2.width+200, size2.height+25);
+        }
+        //make an if statment to make sur ethat the event is a spike
+        else if (strEvent.toLowerCase().equals("spike"))
+        {
+            //initialize the label
+            label = new JLabel("You have come into contact with a spike, you have taken  " + bytImpact + " damage!");
+            
+            //use dimension ato get the predereed size ofthe lable
+            Dimension size2 = label.getPreferredSize();
+            
+            //set the label position with setBounds
+            label.setBounds(575, 200, size2.width+200, size2.height+25);
+        }
+        //make an if statment to make sur ethat the event is a hole
+        else if (strEvent.toLowerCase().equals("hole"))
+        {
+            //initialize the label
+            label = new JLabel("You have fallen into a hole, you have taken  " + bytImpact + " damage!");
+            
+            //use dimension ato get the predereed size of the lable
+            Dimension size2 = label.getPreferredSize();
+            
+            //set the label position with setBounds
+            label.setBounds(575, 200, size2.width+200, size2.height+25);
+        }
+        //make an if statment to make sur ethat the event is a fire
+        else if (strEvent.toLowerCase().equals("fire"))
+        {
+            //initialize the label
+            label = new JLabel("You have come into contact with a fire trap, you have taken  " + bytImpact + " damage!");
+            
+            //use dimension ato get the predereed size of the lable
+            Dimension size2 = label.getPreferredSize();
+            
+            //set the label position with setBounds
+            label.setBounds(575, 200, size2.width+200, size2.height+25);
+        }
+
+        //initialize the button
+        button1 = new JButton("Continue");
+        
+        //use dimension to get the predereed size of the button
+        Dimension size = button1.getPreferredSize();
+        
+        //set the button position with setBounds
+        button1.setBounds(700, 500, size.width+25, size.height+25);
+
+        //use dimension to get the predereed size of the image
+        Dimension size3 = image.getPreferredSize();
+        
+        //set the image position with setBounds
+        image.setBounds(725, 350, size.width+200, size.height+25);
+
+        //set the event panel to center
+        eventPanel.setLayout(null);  
+        
+        //add tthe label to the panel
+        eventPanel.add(label);
+        
+        //add the button to the panel
+        eventPanel.add(button1);
+        
+        //add the image to the panel
+        eventPanel.add(image);
+
+        //create an action listener event on the button
+        button1.addActionListener(new ActionListener() 
+            {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    //dispose the action frame
+                    actionFrame.dispose();
+                    
+                    //set the action frame visibility to false
+                    actionFrame.setVisible(false);
+                }
+            }
+        );
+
+    }
+    //Create getters and setter for the above private variables
+    public byte getIndex()
+    {
+        return this.bytIndex;
+    }
+
+    public void setIndex(byte index)
+    {
+        this.bytIndex = index;
+    }
+
+    public byte getHealth()
+    {
+        return this.bytHealth;
+    }
+
+    public void setHealth(byte health)
+    {
+        this.bytHealth = health;
+    }
+
+    public byte getAmount()
+    {
+        return this.bytAmount;
+    }
+
+    public void setAmount(byte amount)
+    {
+        this.bytAmount = amount;
+    }
+
+    public byte getLow()
+    {
+        return this.bytLow;
+    }
+
+    public void setLow(byte low)
+    {
+        this.bytLow = low;
+    }
+
+    public byte getHigh()
+    {
+        return this.bytHigh;
+    }
+
+    public void setHigh(byte high)
+    {
+        this.bytHigh = high;
+    }
+
+    public byte getPoint()
+    {
+        return this.bytPoints;
+    }
+
+    public void setPoint(byte point)
+    {
+        this.bytPoints = point;
+    }
+
+    public String getEvent()
+    {
+        return this.strEvent;
+    }
+
+    public void setEvent(String event)
+    {
+        this.strEvent = event;
+    }
+
+    public byte getDamage()
+    {
+        return this.bytDamage;
+    }
+
+    public void setDamage(byte damage)
+    {
+        this.bytDamage = damage;
+    }
+
+}
