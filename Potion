@@ -1,0 +1,44 @@
+
+/**
+ * Write a description of class Potion here.
+ *
+ *Create class which will set all of the infromation for the potion
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Potion extends Items
+{
+    public Potion()
+    {  
+        //set the index by calling it from the super class
+        setIndex((byte)(1));
+        
+        //set the amount by calling it from the super class
+        setAmount((byte)(15));
+        
+        //set the health by calling it from the super class
+        setHealth((byte)(1));
+
+        //set the low by calling it from the super class
+        setLow((byte)(10));
+        
+        //set the high by calling it from the super class
+        setHigh((byte)(30));
+
+        //set the points by calling it from the super class
+        setPoint((byte)(rand.nextInt((getHigh()-getLow())) + getLow()));
+
+        //add the image to the array list
+        itemImages.add("Potion.png");
+        
+        //set the event by calling it from the super class
+        setEvent("potion");
+        
+    }
+    
+    public void healthPotion(byte gridSize)
+    {
+        Scene(gridSize,getEvent(),getHealth(),getPoint(), getIndex());
+    }
+}
