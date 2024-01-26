@@ -1,0 +1,32 @@
+/**
+ * Write a description of class Teleporter here.
+ *
+ * Create class which will set all of the infromation for the teleporter
+ *
+ * @author (Kareem)
+ * @version (2024-01-18)
+ */
+public class Teleporter extends Items
+{
+    public Teleporter()
+    {
+        //set the index by calling it from the super class
+        setIndex((byte)(2));
+        
+        //set the amount by calling it from the super class
+        setAmount((byte)(1));
+         
+        //set the low by calling it from the super class
+        setLow((byte)(100));
+        
+        //set the high by calling it from the super class
+        setHigh((byte)(115));
+        
+        
+        //set the point by calling it from the super class
+        setPoint((byte)(rand.nextInt((getHigh()-getLow())) + getLow()));
+        
+        //add the image
+        itemImages.add("Teleporter.png");
+    }
+}
