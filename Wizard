@@ -1,0 +1,47 @@
+
+/**
+ * Write a description of class Wizard here.
+ *
+ *Make a class which will hold the information about the wizard, and start the game with the inforamtion of the wizard class
+ *
+ * @author (Kareem Maamoun)
+ * @version (2024-01-18)
+ */
+public class Wizard extends Character 
+{
+
+    //create a constructor which will populate the different variables which the warrior class will have, will be called if string 
+    public Wizard ()
+    {
+        //call a setter for the character health
+        setCharacterHealth((byte)(7));
+
+        //call a setter for the character speed
+        setCharacterSpeed((byte)(3));
+
+        //call a setter for the character image file
+        setFileName("Wizard.png");     
+    }
+
+    //called when a string is entered for an updated character, scalability
+    public Wizard (String fileName)
+    {
+
+        //call a setter for the character health
+        setCharacterHealth((byte)(7));
+
+        //call a setter for the character speed
+        setCharacterSpeed((byte)(3));
+
+        //create a new grid object will the following information
+        Grid grid = new Grid(fileName,getCharacterSpeed(),getCharacterHealth());
+
+    }
+
+    //begin the game
+    public void beginGame(String strFile)
+    {
+        //create a new grid object will the following information
+        Grid grid = new Grid(strFile,getCharacterSpeed(),getCharacterHealth());
+    }
+}
